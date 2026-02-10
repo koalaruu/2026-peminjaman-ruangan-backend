@@ -3,28 +3,38 @@ using RoomBookingApp.api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Membaca Connection String dari appsettings.json
+// 1. Membaca Connection String
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Registrasi DbContext untuk SQLite
+// 2. Registrasi DbContext dengan Pengabaian Peringatan Migrasi (Biar tidak error lagi)
 builder.Services.AddDbContext<ApiDbContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlite(connectionString)
+           .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
-// Registrasi Controller
+// 3. Konfigurasi CORS (PENTING: Agar Frontend React bisa akses API)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy.WithOrigins("http://localhost:5173") // Port Vite kamu
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
 builder.Services.AddControllers();
-
-// Konfigurasi Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Konfigurasi Pipeline HTTP
+// 4. Konfigurasi Pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Gunakan CORS sebelum Authorization dan MapControllers
+app.UseCors("AllowReactApp"); 
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
