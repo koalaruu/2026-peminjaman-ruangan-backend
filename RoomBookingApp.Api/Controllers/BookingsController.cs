@@ -18,12 +18,25 @@ namespace RoomBookingApp.api.Controllers
 
         // 1. GET:
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Booking>>> GetBookings()
+        public async Task<ActionResult<IEnumerable<Booking>>> GetBookings([FromQuery] string? searchTerm)
         {
-            return await _context.Bookings.ToListAsync();
+            var query = _context.Bookings.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var lowerCaseSearchTerm = searchTerm.ToLower();
+                query = query.Where(b => 
+                    b.RoomName.ToLower().Contains(lowerCaseSearchTerm) || 
+                    b.RequesterName.ToLower().Contains(lowerCaseSearchTerm) || 
+                    b.Purpose.ToLower().Contains(lowerCaseSearchTerm) ||
+                    b.Status.ToLower().Contains(lowerCaseSearchTerm)
+                );
+            }
+
+            return await query.OrderByDescending(b => b.CreatedAt).ToListAsync();
         }
 
-        // 2. GET: 
+        // 2. GET 
         [HttpGet("{id}")]
         public async Task<ActionResult<Booking>> GetBooking(int id)
         {
