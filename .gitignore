@@ -273,6 +273,10 @@ ServiceFabricBackup/
 *.mdf
 *.ldf
 *.ndf
+# SQLite write-ahead and shared-memory files (transient)
+*.db-wal
+*.db-shm
+*.db-journal
 
 # Business Intelligence projects
 *.rdl.data
