@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoomBookingApp.api.Models
 {
@@ -8,8 +9,14 @@ namespace RoomBookingApp.api.Models
         [Key]
         public int Id { get; set; }
 
+        // Foreign key to Room table (normalized)
         [Required]
-        public string RoomName { get; set; } = string.Empty;
+        public int RoomId { get; set; }
+        public Room? Room { get; set; }
+
+        [NotMapped]
+        // kept for JSON compatibility in responses (computed from navigation)
+        public string RoomName => Room?.Name ?? string.Empty;
 
         [Required]
         public string RequesterName { get; set; } = string.Empty;
