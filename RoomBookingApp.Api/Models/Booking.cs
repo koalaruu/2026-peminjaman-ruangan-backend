@@ -33,6 +33,6 @@ namespace RoomBookingApp.api.Models
         [Required]
         public string Status { get; set; } = "Menunggu";
 
-        public DateTime CreatedAt { get; set; } = new DateTime(2026, 2, 11, 10, 0, 0);
+        public DateTime CreatedAt { get; set; }
     }
 }
